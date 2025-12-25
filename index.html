@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Генератор приглашений — Ключи Форта</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: url('background.jpg') center/cover no-repeat fixed;
+    }
+
+    header {
+      background: #6c482e;
+      color: #fff;
+      padding: 14px 24px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+    header .title { font-family: 'Cinzel', serif; }
+    header img { height: 80px; justify-self: center; }
+
+    .container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 24px;
+      background: rgba(227, 217, 207, 0.95);
+      border-radius: 14px;
+      display: grid;
+      grid-template-columns: 0.6fr 0.7fr;
+      gap: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3),
+              0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      grid-column: 1 / -1;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      margin: 0;
+    }
+
+    label { display: block; margin-top: 12px; font-weight: 600; }
+
+    input, select, textarea {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      font-family: inherit;
+    }
+
+    textarea { min-height: 100px; }
+
+    button {
+      margin-top: 18px;
+      padding: 14px;
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      background: #6c482e;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .preview-wrapper { display: flex; justify-content: center; }
+
+    .card {
+      width: 504px;
+      height: 720px;  
+      position: relative;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .field {
+      position: absolute;
+      left: 48px;
+      right: 48px;
+      text-align: center;
+      font-weight: 600;
+      opacity: 0;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 36px;
+      width: 100%;
+      text-align: center;
+      font-weight: 700;
+      opacity: 0;
+    }
+   
+    .address-text {
+      text-align: left;
+      padding-left: 50px;
+      text-indent: 215px;
+      line-height: 1.8;
+    }
+    
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+      .card { transform: scale(0.85); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="title">Квест-шоу</div>
+  <img src="logo.png" alt="Ключи Форта">
+  <div class="title" style="text-align:right">Ключи Форта</div>
+</header>
+
+<div class="container">
+  <h1>Создайте пригласительные на Квест-шоу «Форт Боярд»</h1>
+
+  <form id="form">
+    <label>Вариант приглашения</label>
+    <select id="type" required>
+      <option value="">— выберите —</option>
+      <option value="kid">ДР дети</option>
+      <option value="adult">ДР взрослые</option>
+      <option value="school">Выпускной 4/9/11</option>
+      <option value="kindergarten">Выпускной детский сад</option>
+      <option value="trip">Поход классом</option>
+      <option value="corporate">Корпоратив</option>
+    </select>
+
+    <div id="dynamic-fields"></div>
+
+    <label>Адрес</label>
+    <select id="address" required>
+      <option value="">— выберите —</option>
+      <option value="г. Москва, Варшав- ское шоссе, д.95 к.1, ТК «Аэробус», 3-й этаж">
+        г. Москва, Варшавское шоссе, д.95 к.1, ТК «Аэробус», 3-й этаж
+      </option>
+      <option value="__custom__">➕ Добавить новый адрес</option>
+    </select>
+
+    <input id="customAddress" placeholder="Введите новый адрес" style="display:none; margin-top:8px;">
+
+    <label>Дата</label>
+    <input type="date" id="date" required>
+
+    <label>Время</label>
+    <input type="time" id="time" required>
+
+    <label>Имена гостей</label>
+    <textarea id="names" required></textarea>
+
+    <button type="button" id="download">Скачать</button>
+  </form>
+
+  <div class="preview-wrapper">
+    <div class="card" id="card">
+      <div class="field" id="invite"></div>
+      <div class="field address-text" id="addressField"></div>
+      <div class="field" id="dateField"></div>
+      <div class="field" id="field1"></div>
+      <div class="field" id="field2"></div>
+      <div class="field" id="guestField"></div>
+      <div class="field" id="timeField"></div>
+      <div class="field" id="eventNameField"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  
+const TEMPLATES = {
+  kid: {
+    bg: 'kid.png',
+    invite: { top: 240,left: 150,size: 20  },
+    address: { top: 357, left: 20 },
+    date: { top: 420, left: -115 },
+    time: { top: 449, left: 45 },
+    guest: { top: 2200, left: 40 }
+  },
+  adult: { 
+    bg: 'adult.png',
+    invite: { top: 240,left: 150,size: 20  }, 
+    address: { top: 362, left: 20 }, 
+    date: { top: 425, left: -100 },
+    time: { top: 454, left: 50 } 
+  },
+  school: { 
+    bg: 'school.png', 
+    invite: { top: 263,left: 37,size: 20  }, 
+    address: { top: 395, left: 20 }, 
+    date: { top: 460, left: -100 },
+    time: { top: 489, left: 50 },
+    field1: { top: 297, left: -50 },    // номер класса
+    field2: { top: 294, left: 345 }     // номер школы
+  },
+  kindergarten: { 
+    bg: 'kindergarten.png', 
+    invite: { top: 263,left: 37,size: 20  }, 
+    address: { top: 405, left: 20 },  
+    date: { top: 470, left: -100 },
+    time: { top: 499, left: 50 },
+    field1: { top: 297, left:300 },    // воспитанник детского сада
+    field2: { top: 325, left: -140 }     // группа
+  },
+  trip: { 
+    bg: 'trip.png', 
+     invite: { top: 263,left: 37,size: 20  }, 
+    address: { top: 408, left: 15 }, 
+    date: { top: 471, left: -100 },
+    time: { top: 501, left: 50 },
+     field1: { top: 297, left: -50 },    // номер класса
+    field2: { top: 296, left: 350 }     // номер школы
+  },
+  corporate: {
+    bg: 'corporate.png', 
+    invite: { top: 240,left: 150,size: 20  },
+    address: { top: 392, left: 20 },
+    date: { top: 455, left: -100 },
+    time: { top: 484, left: 50 },
+    guest: { top: 260, left: 40 },
+    eventName: { top: 243, left: 40 }
+  }
+};
+
+const typeEl = document.getElementById('type');
+const dynamicFields = document.getElementById('dynamic-fields');
+const card = document.getElementById('card');
+const inviteEl = document.getElementById('invite');
+const addressSelect = document.getElementById('address');
+const customAddressInput = document.getElementById('customAddress');
+const addressField = document.getElementById('addressField');
+const dateField = document.getElementById('dateField');
+const dateEl = document.getElementById('date');
+const timeEl = document.getElementById('time');
+const timeField = document.getElementById('timeField');
+const namesEl = document.getElementById('names');
+const footerEl = document.querySelector('.footer');
+const field1 = document.getElementById('field1');
+const field2 = document.getElementById('field2');
+const guestField = document.getElementById('guestField');
+const eventNameField = document.getElementById('eventNameField');
+
+const ADDRESS_STORAGE_KEY = 'fort_addresses';
+
+function loadSavedAddresses() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ADDRESS_STORAGE_KEY) || '[]');
+    saved.forEach(addr => {
+      const opt = document.createElement('option');
+      opt.value = addr;
+      opt.textContent = addr;
+      addressSelect.insertBefore(opt, addressSelect.lastElementChild);
+    });
+  } catch (e) {
+    console.error('Error loading addresses:', e);
+  }
+}
+
+function saveAddress(addr) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ADDRESS_STORAGE_KEY) || '[]');
+    if (!saved.includes(addr)) {
+      saved.push(addr);
+      localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(saved));
+    }
+  } catch (e) {
+    console.error('Error saving address:', e);
+  }
+}
+
+addressSelect.addEventListener('change', () => {
+  if (addressSelect.value === '__custom__') {
+    customAddressInput.style.display = 'block';
+    customAddressInput.required = true;
+    customAddressInput.focus();
+  } else {
+    customAddressInput.style.display = 'none';
+    customAddressInput.required = false;
+  }
+});
+
+customAddressInput.addEventListener('blur', () => {
+  const value = customAddressInput.value.trim();
+  if (!value) return;
+
+  saveAddress(value);
+
+  const opt = document.createElement('option');
+  opt.value = value;
+  opt.textContent = value;
+  addressSelect.insertBefore(opt, addressSelect.lastElementChild);
+  addressSelect.value = value;
+
+  customAddressInput.value = '';
+  customAddressInput.style.display = 'none';
+});
+
+function renderDynamicFields() {
+  dynamicFields.innerHTML = '';
+
+  if (typeEl.value === 'school' || typeEl.value === 'trip') {
+    dynamicFields.innerHTML =
+      '<label>Номер класса</label><input id="input1" maxlength="5">' +
+      '<label>Номер школы</label><input id="input2" maxlength="5">';
+  }
+
+  if (typeEl.value === 'kindergarten') {
+    dynamicFields.innerHTML =
+      '<label>Воспитанник детского сада</label><input id="input1">' +
+      '<label>Группа</label><input id="input2" maxlength="5">';
+  }
+
+  if (typeEl.value === 'corporate') {
+    dynamicFields.innerHTML = 
+      '<label>Название мероприятия</label>' + 
+      '<input id="eventNameInput" placeholder="Например: Новогодний корпоратив">';
+  }
+}
+
+function applyTemplate() {
+  const t = TEMPLATES[typeEl.value];
+  if (!t) return;
+  
+  card.style.backgroundImage = 'url(' + t.bg + ')';
+
+  // Address
+  addressField.style.top = t.address.top + 'px';
+  addressField.style.left = '';
+  addressField.style.right = '';
+  if (t.address.left !== undefined) {
+    addressField.style.left = t.address.left + 'px';
+  }
+  if (t.address.right !== undefined) {
+    addressField.style.right = t.address.right + 'px';
+  }
+
+  // Date
+  dateField.style.top = t.date.top + 'px';
+  dateField.style.left = '';
+  dateField.style.right = '';
+  if (t.date.left !== undefined) {
+    dateField.style.left = t.date.left + 'px';
+  }
+  if (t.date.right !== undefined) {
+    dateField.style.right = t.date.right + 'px';
+  }
+
+  // Time
+  if (t.time) {
+    timeField.style.top = t.time.top + 'px';
+    timeField.style.left = '';
+    timeField.style.right = '';
+    if (t.time.left !== undefined) {
+      timeField.style.left = t.time.left + 'px';
+    }
+    if (t.time.right !== undefined) {
+      timeField.style.right = t.time.right + 'px';
+    }
+  }
+
+  // Guest
+ 
+  // Field1 (класс/воспитанник)
+  if (t.field1) {
+    field1.style.top = t.field1.top + 'px';
+    field1.style.left = '';
+    field1.style.right = '';
+    if (t.field1.left !== undefined) {
+      field1.style.left = t.field1.left + 'px';
+    }
+    if (t.field1.right !== undefined) {
+      field1.style.right = t.field1.right + 'px';
+    }
+  }
+
+  // Field2 (школа/группа)
+  if (t.field2) {
+    field2.style.top = t.field2.top + 'px';
+    field2.style.left = '';
+    field2.style.right = '';
+    if (t.field2.left !== undefined) {
+      field2.style.left = t.field2.left + 'px';
+    }
+    if (t.field2.right !== undefined) {
+      field2.style.right = t.field2.right + 'px';
+    }
+  }
+
+  // Event Name (для корпоратива)
+  if (t.eventName) {
+    eventNameField.style.top = t.eventName.top + 'px';
+    eventNameField.style.left = '';
+    eventNameField.style.right = '';
+    if (t.eventName.left !== undefined) {
+      eventNameField.style.left = t.eventName.left + 'px';
+    }
+    if (t.eventName.right !== undefined) {
+      eventNameField.style.right = t.eventName.right + 'px';
+    }
+  }
+
+  
+// Invite field
+if (t.invite) {
+  inviteEl.style.top = t.invite.top + 'px';
+  inviteEl.style.fontSize = t.invite.size + 'px';
+  inviteEl.style.left = '';
+  inviteEl.style.right = '';
+  if (t.invite.left !== undefined) {
+    inviteEl.style.left = t.invite.left + 'px';
+  }
+  if (t.invite.right !== undefined) {
+    inviteEl.style.right = t.invite.right + 'px';
+  }
+}
+}
+
+function updatePreview(name) {
+  if (!typeEl.value) return;
+
+  
+  addressField.textContent = addressSelect.value;
+  dateField.textContent = dateEl.value;
+  timeField.textContent = timeEl.value;
+  
+  // Обработка полей для школы, детсада, похода классом
+  const input1 = document.getElementById('input1');
+  const input2 = document.getElementById('input2');
+
+  if (typeEl.value === 'school' || typeEl.value === 'trip' || typeEl.value === 'kindergarten') {
+    const text1 = input1?.value || '';
+    const text2 = input2?.value || '';
+    
+    field1.textContent = text1;
+    field2.textContent = text2;
+    field1.style.opacity = text1 ? 1 : 0;
+    field2.style.opacity = text2 ? 1 : 0;
+  } else {
+    field1.style.opacity = 0;
+    field2.style.opacity = 0;
+  }
+
+  
+  addressField.style.opacity = 1;
+  dateField.style.opacity = 1;
+  if (footerEl) footerEl.style.opacity = 1;
+  timeField.style.opacity = 1;
+  
+  // Обработка названия мероприятия для корпоратива
+  const eventNameInput = document.getElementById('eventNameInput');
+  if (typeEl.value === 'corporate' && eventNameInput) {
+    const eventText = eventNameInput.value || '';
+    eventNameField.textContent = eventText;
+    eventNameField.style.opacity = eventText ? 1 : 0;
+  } else {
+    eventNameField.textContent = '';
+    eventNameField.style.opacity = 0;
+
+     if (!name) {
+    const names = namesEl.value.split(/[\n,]+/).map(n => n.trim()).filter(Boolean);
+    name = names[0] || '';
+  }
+  
+  inviteEl.textContent = name;
+  inviteEl.style.opacity = 1;
+  }
+}
+
+typeEl.addEventListener('change', () => {
+  renderDynamicFields();
+  applyTemplate();
+  updatePreview('');
+});
+
+document.getElementById('form').addEventListener('input', () => updatePreview(''));
+
+loadSavedAddresses();
+
+const form = document.getElementById('form');
+
+document.getElementById('download').addEventListener('click', async () => {
+  if (!form.checkValidity()) { 
+    form.reportValidity(); 
+    return; 
+  }
+
+  const names = namesEl.value.split(/[\n,]+/).map(n => n.trim()).filter(Boolean);
+  let pdf = null;
+
+  for (let i = 0; i < names.length; i++) {
+    updatePreview(names[i]);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    const canvas = await html2canvas(card, { scale: 2 });
+    const img = canvas.toDataURL('image/png');
+
+    if (i === 0) {
+      pdf = new jspdf.jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+    } else {
+      pdf.addPage([canvas.width, canvas.height]);
+    }
+
+    pdf.addImage(img, 'PNG', 0, 0, canvas.width, canvas.height);
+  }
+
+  if (pdf) {
+    pdf.save('invites.pdf');
+  }
+});
+</script>
+
+</body>
+</html>
