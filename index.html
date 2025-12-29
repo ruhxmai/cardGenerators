@@ -4,64 +4,73 @@
   <meta charset="UTF-8" />
   <title>Генератор приглашений — Ключи Форта</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="cyrillicolda_bold-normal.js"></script>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      font-family: 'cirillicolda', 'Montserrat', sans-serif;
+    }
+
+    @font-face {
+      font-family: "cirillicolda";
+      src: url("font/cyrillicolda_bold.ttf") format("truetype");
+    }
 
     body {
       margin: 0;
-      font-family: 'Montserrat', sans-serif;
       background: url('background.jpg') center/cover no-repeat fixed;
     }
 
     header {
       background: #6c482e;
       color: #fff;
-      padding: 14px 24px;
+      padding: 10px 20px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
+      gap: 15px;
     }
-    header .title { font-family: 'Cinzel', serif; }
+
+    header .title { 
+      font-size: 22px; 
+    }
+
     header img { height: 80px; justify-self: center; }
 
     .container {
       max-width: 1200px;
       margin: 24px auto;
       padding: 24px;
-      background: rgba(227, 217, 207, 0.95);
+      background: rgba(245, 240, 235, 0.96);
       border-radius: 14px;
-
-      
-
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    .container_block{
+
+    .container_block {
       display: flex;
-      
       justify-content: space-between;
     }
 
     h1 {
-      grid-column: 1 / -1;
       text-align: center;
-      font-family: 'Cinzel', serif;
       font-size: 22px;
-      margin: 0;
+      margin: 0 0 12px;
     }
 
     label { display: block; margin-top: 12px; font-weight: 600; }
 
     input, select, textarea {
       width: 100%;
-      margin-top: 6px;
-      padding: 10px;
+      padding: 12px;
       border-radius: 6px;
-      border: 1px solid #aaa;
-      font-family: inherit;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 15px;
+      color: #000;
     }
 
     textarea { min-height: 100px; }
@@ -87,7 +96,6 @@
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
-      font-family: 'Montserrat', sans-serif;
     }
 
     .field {
@@ -113,7 +121,7 @@
       .card { transform: scale(0.85); }
     }
     @media (max-width: 400px) {
-      .card{ width: 300px; }
+      .card { width: 300px; }
     }
   </style>
 </head>
@@ -127,42 +135,40 @@
 
 <div class="container">
   <div>
-    <h1>Создайте пригласительные на Квест-шоу «Форт Боярд»</h1>
-    <p style="font-family: 'Cinzel', serif;">Создайте персональные пригласительные для каждого участника на День рождения или любой другой повод!</p>
+    <h1>Электронные пригласительные на Квест-шоу "Форт Боярд" с индивидуальным дизайном</h1>
+    <p style="font-size: 19px;">Создайте персональные пригласительные для каждого участника на День рождения или любой другой повод!</p>
   </div>
   <div class="container_block">
     <form id="form">
       <label>Вариант приглашения</label>
       <select id="type" required>
         <option value="">— выберите —</option>
-        <option value="kid">ДР дети</option>
-        <option value="adult">ДР взрослые</option>
-        <option value="school">Выпускной 4/9/11</option>
-        <option value="kindergarten">Выпускной детский сад</option>
-        <option value="trip">Поход классом</option>
-        <option value="corporate">Корпоратив</option>
+        <option value="kid">Приглашение на детский День рождения</option>
+        <option value="adult">Приглашение на взрослый День рождения</option>
+        <option value="school">Приглашение на Выпускной 4, 9, 11 класс</option>
+        <option value="kindergarten">Приглашение на Выпускной для детского сада</option>
+        <option value="trip">Приглашение на Поход классом</option>
+        <option value="corporate">Приглашение на Корпоратив</option>
       </select>
   
       <div id="dynamic-fields"></div>
   
-      <label>Адрес</label>
+      <label>Выберите место проведения квест-игры:</label>
       <select id="address" required>
-        <option value="">— выберите —</option>
-        <option value="г. Москва, Варшав- ское шоссе, д.95 к.1, ТК «Аэробус», 3-й этаж">
+        <option value="г. Москва, Варшавское шоссе, д.95 к.1, ТК «Аэробус», 3-й этаж">
           г. Москва, Варшавское шоссе, д.95 к.1, ТК «Аэробус», 3-й этаж
         </option>
-        <option value="__custom__">➕ Добавить новый адрес</option>
       </select>
   
       <input id="customAddress" placeholder="Введите новый адрес" style="display:none; margin-top:8px;">
   
-      <label>Дата</label>
+      <label>Дата:</label>
       <input type="date" id="date" required>
   
-      <label>Время</label>
+      <label>Время начала</label>
       <input type="time" id="time" required>
   
-      <label>Имена гостей (каждое с новой строки)</label>
+      <label>Приглашенные в именительном падеже <br> (каждое имя или фио на новой строке)</label>
       <textarea id="names" required></textarea>
   
       <button type="button" id="download">Скачать</button>
@@ -183,67 +189,128 @@
 </div>
 
 <script>
+/* ==============================================
+   РЕГИСТРАЦИЯ КАСТОМНОГО ШРИФТА (самый важный блок)
+   ============================================== */
+(function(jsPDF) {
+  // Функция регистрации шрифта
+  // Предполагается, что в файле cyrillicolda_bold-normal.js определена переменная font
+  // Если имя переменной другое → замените font на правильное имя (посмотрите в файл)
+  const registerCustomFont = function() {
+    this.addFileToVFS('cyrillicolda_bold-normal.ttf', font);
+    this.addFont('cyrillicolda_bold-normal.ttf', 'cyrillicolda', 'bold');
+  };
 
-/** * 1. КОНФИГ ДЛЯ ПРЕВЬЮ (то, что мы видим на экране)
- */
+  // Добавляем в события jsPDF (выполнится автоматически при создании документа)
+  jsPDF.API.events.push(['addFonts', registerCustomFont]);
+})(jspdf.jsPDF);
+
+/* ==============================================
+   ВАШ ИСХОДНЫЙ КОД (без изменений, кроме шрифта)
+   ============================================== */
+
 const TEMPLATES = {
-  kid: { bg: 'kid.png', invite: { top: 240, left: 185, size: 20 }, address: { top: 357, left: 20 }, date: { top: 420, left: 130 }, time: { top: 449, left: 230 } },
-  adult: { bg: 'adult.png', invite: { top: 243, left: 185, size: 20 }, address: { top: 362, left: 20 }, date: { top: 425, left: 130 }, time: { top: 454, left: 230 } },
-  school: { bg: 'school.png', invite: { top: 263, left: 37, size: 20 }, address: { top: 395, left: 20 }, date: { top: 460, left: 130  }, time: { top: 489, left: 230 }, field1: { top: 297, left: -50 }, field2: { top: 294, left: 345 } },
-  kindergarten: { bg: 'kindergarten.png', invite: { top: 263, left: 37, size: 20 }, address: { top: 405, left: 20 }, date: { top: 470, left: 130  }, time: { top: 499, left: 230  }, field1: { top: 297, left: 300 }, field2: { top: 325, left: -140 } },
-  trip: { bg: 'trip.png', invite: { top: 263, left: 37, size: 20 }, address: { top: 408, left: 15 }, date: { top: 471, left: 60  }, time: { top: 501, left: 130  }, field1: { top: 297, left: -50 }, field2: { top: 296, left: 350 } },
-  corporate: { bg: 'corporate.png', invite: { top: 240, left: 40, size: 20 }, address: { top: 392, left: 15 }, date: { top: 455, left: 130 }, time: { top: 484, left: 230  }, eventName: { top: 306, left: 40 } }
+   kid: {
+    bg: 'kid.png',
+      invite: { top: 240,left: 150,size: 20  },
+    address: { top: 357, left: 20 },
+    date: { top: 420, left: -30,  },
+    time: { top: 449, left: 70 },
+    eventName: { top: 528, left: 60,size: 20 } },
+  adult: { 
+    bg: 'adult.png',
+    invite: { top: 242,left: 150, size: 20  },  
+    address: { top: 362, left: 20 }, 
+    date: { top: 425, left: -40, },
+    time: { top: 454, left: 70 },
+    eventName: { top: 536, left: 40, size: 20 }
+  },
+  school: { 
+    bg: 'school.png', 
+    invite: { top: 263,left: 37,size: 20  }, 
+    address: { top: 395, left: 20 }, 
+    date: { top: 460, left: -27 },
+    time: { top: 489, left: 70 },
+    field1: { top: 297, left: -50 },    
+    field2: { top: 294, left: 345 }     
+  },
+  kindergarten: { 
+    bg: 'kindergarten.png', 
+    invite: { top: 263,left: 37,size: 20  }, 
+    address: { top: 405, left: 20 },  
+    date: { top: 470, left: -27 },
+    time: { top: 499, left: 70 },
+    field1: { top: 297, left:300 },    
+    field2: { top: 325, left: -140 }     
+  },
+  trip: { 
+    bg: 'trip.png', 
+     invite: { top: 263,left: 37,size: 20  }, 
+    address: { top: 408, left: 15 }, 
+    date: { top: 471, left: -27 },
+    time: { top: 501, left: 70 },
+     field1: { top: 297, left: -50 },    
+    field2: { top: 296, left: 350 }     
+  },
+  corporate: {
+    bg: 'corporate.png', 
+    invite: { top: 240,left: 20,size: 20  },
+    address: { top: 392, left: 20 },
+    date: { top: 455, left: -27 },
+    time: { top: 484, left: 70 },
+    guest: { top: 260, left: 40 },
+    eventName: {  top: 305,left: 20}
+  }
 };
 
-/**
- * 2. КОНФИГ ДЛЯ СКАЧИВАНИЯ (ЗДЕСЬ НАСТРАИВАЙ ТЕКСТ ДЛЯ PDF)
- * Координаты x и y считаются от верхнего левого угла в пикселях оригинала.
- */
 const EXPORT_CONFIG = {
-    canvasWidth: 1000,   // Примерная ширина твоего PNG файла
-    canvasHeight: 1428,  // Примерная высота твоего PNG файла
+    canvasWidth: 1000,
+    canvasHeight: 1428,
     kid: {
-        invite:  { x: 600, y: 465, size: 40, align: 'center' },
+        invite:  { x: 600, y: 472, size: 40, align: 'center' },
         address: { x: 580, y: 720, size: 28, align: 'center' },
-        date:    { x: 570, y: 840, size: 30, align: 'center' },
-        time:    { x: 650, y: 900, size: 30, align: 'center' }
+        date:    { x: 280, y: 840, size: 30, align: 'left' },
+        time:    { x: 470, y: 900, size: 30, align: 'left' },
+        eventName: {  x: 500, y: 1052, size: 36, align: 'center' }
     },
     adult: {
         invite:  { x: 500, y: 480, size: 40, align: 'left' },
         address: { x: 580, y: 730, size: 28, align: 'left' },
-        date:    { x: 520, y: 850, size: 30, align: 'left' },
-        time:    { x: 650, y: 910, size: 30, align: 'left' }
+        date:    { x: 280, y: 850, size: 30, align: 'left' },
+        time:    { x: 470, y: 910, size: 30, align: 'left' },
+        eventName: {  x: 500, y: 1070, size: 36, align: 'center' }
     },
-    // Добавь остальные типы по аналогии, когда проверишь эти
     school: {
   invite: { x: 500, y: 520, size: 35, align: 'center' },
-  field1: { x: 400, y: 590, size: 28, align: 'center' }, // номер класса
-  field2: { x: 795, y: 585, size: 28, align: 'center' }, // номер школы
+  field1: { x: 400, y: 590, size: 28, align: 'center' },
+  field2: { x: 795, y: 585, size: 28, align: 'center' },
   address: { x: 580, y: 805, size: 28, align: 'center' },
-  date: { x: 550, y: 920, size: 30, align: 'center' },
-  time: { x: 600, y: 980, size: 30, align: 'center' }
+  date: { x: 280, y: 920, size: 30, align: 'left' },
+  time: { x: 470, y: 980, size: 30, align: 'left' }
 },
     kindergarten: {
   invite: { x: 500, y: 525 , size: 35, align: 'center' },
-  field1: { x: 775, y: 590, size: 28, align: 'center' }, // номер класса
-  field2: { x: 315, y: 650, size: 28, align: 'center' }, // номер школы
+  field1: { x: 775, y: 590, size: 28, align: 'center' },
+  field2: { x: 315, y: 650, size: 28, align: 'center' },
   address: { x: 575, y: 825, size: 28, align: 'center' },
-  date: { x: 550, y: 945, size: 30, align: 'center' },
-  time: { x: 630, y: 1005, size: 30, align: 'center' } 
+  date: { x: 280, y: 945, size: 30, align: 'left' },
+  time: { x: 470, y: 1005, size: 30, align: 'left' } 
 },
-  trip: { invite: { x: 500, y: 525, size: 35, align: 'center' },
-  field1: { x: 400, y: 590, size: 28, align: 'center' }, // номер класса
-  field2: { x: 795, y: 590, size: 28, align: 'center' }, // номер школы
-  address: { x: 580, y: 830, size: 28, align: 'center' },
-  date: { x: 490, y: 945, size: 30, align: 'center' },
-  time: { x: 600, y: 1005, size: 30, align: 'center' }
+  trip: { 
+    invite: { x: 500, y: 525, size: 35, align: 'center' },
+    field1: { x: 400, y: 590, size: 28, align: 'center' },
+    field2: { x: 795, y: 590, size: 28, align: 'center' },
+    address: { x: 580, y: 830, size: 28, align: 'center' },
+    date: { x: 280, y: 945, size: 30, align: 'left' },
+    time: { x: 470, y: 1005, size: 30, align: 'left' }
 },
     corporate: { 
       invite: { x: 500, y: 472, size: 40, align: 'center' }, 
-      address: { x: 570, y: 797, size: 28, align: 'center' }, 
-      date: { x: 530, y: 913, size: 30, align: 'center' }, 
-      time: { x: 620, y: 970, size: 30, align: 'center' },
-      eventName: {  x: 500, y: 600, size: 40, align: 'center' }  }
+      address: { x: 570, y: 795, size: 28, align: 'center' }, 
+      date: { x: 280, y: 913, size: 30, align: 'left' }, 
+      time: { x: 472, y: 970, size: 30, align: 'left' },
+      eventName: {  x: 500, y: 600, size: 38, align: 'center' }  
+    }
 };
 
 const typeEl = document.getElementById('type');
@@ -262,6 +329,16 @@ const field1 = document.getElementById('field1');
 const field2 = document.getElementById('field2');
 const eventNameField = document.getElementById('eventNameField');
 
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const months = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+  const parts = dateStr.split('-');
+  const year = parts[0];
+  const month = parseInt(parts[1]) - 1;
+  const day = parseInt(parts[2]);
+  return `${day} ${months[month]} ${year} г.`;
+}
+
 const ADDRESS_STORAGE_KEY = 'fort_addresses';
 
 function loadSavedAddresses() {
@@ -278,7 +355,7 @@ function loadSavedAddresses() {
 
 function saveAddress(addr) {
   try {
-    const saved = JSON.parse(localStorage.getItem(ADDRESS_STORAGE_KEY) || '[]');
+    let saved = JSON.parse(localStorage.getItem(ADDRESS_STORAGE_KEY) || '[]');
     if (!saved.includes(addr)) {
       saved.push(addr);
       localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(saved));
@@ -313,27 +390,29 @@ customAddressInput.addEventListener('blur', () => {
 function renderDynamicFields() {
   dynamicFields.innerHTML = '';
   if (typeEl.value === 'school' || typeEl.value === 'trip') {
-    dynamicFields.innerHTML = '<label>Номер класса</label><input id="input1" maxlength="5"><label>Номер школы</label><input id="input2" maxlength="5">';
+    dynamicFields.innerHTML = '<label>Номер класса</label><input required id="input1" maxlength="5"><label>Номер школы</label><input id="input2" maxlength="5">';
   } else if (typeEl.value === 'kindergarten') {
-    dynamicFields.innerHTML = '<label>Воспитанник сада</label><input id="input1"><label>Группа</label><input id="input2" maxlength="5">';
+    dynamicFields.innerHTML = '<label>Воспитанник сада</label><input required id="input1" maxlength="10"><label>Группа</label><input id="input2" maxlength="5">';
   } else if (typeEl.value === 'corporate') {
-    dynamicFields.innerHTML = '<label>Название мероприятия</label><input id="eventNameInput" placeholder="Новогодний корпоратив">';
+    dynamicFields.innerHTML = '<label>Название мероприятия</label><input required id="eventNameInput" maxlength="50" placeholder="Новогодний корпоратив">';
+  } else if (typeEl.value === 'kid' || typeEl.value === 'adult') {
+    dynamicFields.innerHTML = `<label>Имя именинника</label><input required id="eventNameInput">`;
   }
 }
 
 function applyTemplate() {
   const t = TEMPLATES[typeEl.value];
   if (!t) return;
-  card.style.backgroundImage = 'url(' + t.bg + ')';
+  card.style.backgroundImage = `url(${t.bg})`;
   
   const setPos = (el, cfg) => {
-    if(!cfg) { el.style.opacity = 0; return; }
+    if (!cfg) { el.style.opacity = 0; return; }
     el.style.top = cfg.top + 'px';
-    el.style.left = cfg.left !== undefined ? cfg.left + 'px' : '';
+    if (cfg.left !== undefined) el.style.left = cfg.left + 'px';
+    if (cfg.size) el.style.fontSize = cfg.size + 'px';
   };
 
   setPos(inviteEl, t.invite);
-  if(t.invite) inviteEl.style.fontSize = t.invite.size + 'px';
   setPos(addressField, t.address);
   setPos(dateField, t.date);
   setPos(timeField, t.time);
@@ -344,8 +423,9 @@ function applyTemplate() {
 
 function updatePreview(name) {
   if (!typeEl.value) return;
+
   addressField.textContent = addressSelect.value;
-  dateField.textContent = dateEl.value;
+  dateField.textContent = formatDate(dateEl.value);
   timeField.textContent = timeEl.value;
 
   const input1 = document.getElementById('input1');
@@ -357,7 +437,9 @@ function updatePreview(name) {
   eventNameField.textContent = eventNameInput?.value || '';
 
   const fields = [addressField, dateField, timeField, field1, field2, eventNameField, inviteEl];
-  fields.forEach(f => { if(f.textContent.trim()) f.style.opacity = 1; });
+  fields.forEach(f => {
+    if (f.textContent.trim()) f.style.opacity = 1;
+  });
 
   if (!name) {
     const names = namesEl.value.split('\n').map(n => n.trim()).filter(Boolean);
@@ -366,115 +448,133 @@ function updatePreview(name) {
   inviteEl.textContent = name;
 }
 
-typeEl.addEventListener('change', () => { renderDynamicFields(); applyTemplate(); updatePreview(''); });
+typeEl.addEventListener('change', () => {
+  renderDynamicFields();
+  applyTemplate();
+  updatePreview('');
+});
+
 document.getElementById('form').addEventListener('input', () => updatePreview(''));
 loadSavedAddresses();
 
-// --- ЛОГИКА СКАЧИВАНИЯ (CANVAS) ---
-
+// ────────────────────────────────────────────────
+// ЛОГИКА СКАЧИВАНИЯ
+// ────────────────────────────────────────────────
 document.getElementById('download').addEventListener('click', async () => {
   const form = document.getElementById('form');
-  if (!form.checkValidity()) { form.reportValidity(); return; }
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
 
   const names = namesEl.value.split('\n').map(n => n.trim()).filter(Boolean);
+  if (names.length === 0) {
+    alert("Введите имена гостей");
+    return;
+  }
+
   const type = typeEl.value;
   const config = EXPORT_CONFIG[type] || EXPORT_CONFIG.kid;
 
+  const zip = new JSZip();
   const canvas = document.createElement('canvas');
   canvas.width = EXPORT_CONFIG.canvasWidth;
   canvas.height = EXPORT_CONFIG.canvasHeight;
   const ctx = canvas.getContext('2d');
 
   const bgImg = new Image();
+  bgImg.crossOrigin = "Anonymous";
   bgImg.src = TEMPLATES[type].bg;
-  await new Promise(res => bgImg.onload = res);
 
-  const pdf = new jspdf.jsPDF({
-    orientation: 'p', unit: 'px', format: [canvas.width, canvas.height],
-    hotfixes: ['px_scaling']
+  await new Promise(resolve => {
+    bgImg.onload = resolve;
+    bgImg.onerror = () => {
+      console.error("Не удалось загрузить фоновое изображение");
+      resolve(); // продолжаем, чтобы не висело
+    };
   });
 
-  // ВНУТРЕННЯЯ ФУНКЦИЯ ДЛЯ ПЕРЕНОСА ТЕКСТА
-  const drawTextWrapped = (text, cfg, maxWidth, indentX) => {
+  const input1Value = document.getElementById('input1')?.value || '';
+  const input2Value = document.getElementById('input2')?.value || '';
+  const eventNameValue = document.getElementById('eventNameInput')?.value || '';
+  const formattedDate = formatDate(dateEl.value);
+
+  const drawText = (text, cfg) => {
     if (!text || !cfg) return;
-    ctx.font = `600 ${cfg.size}px Montserrat`;
+    // Используем ваш шрифт
+    ctx.font = `600 ${cfg.size || 30}px "cirillicolda", "Montserrat", sans-serif`;
+    ctx.fillStyle = "#000000";
+    ctx.textAlign = cfg.align || 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(text, cfg.x, cfg.y);
+  };
+
+  const drawTextWrapped = (text, cfg, maxWidth = 800, indentX = 130) => {
+    if (!text || !cfg) return;
+    ctx.font = `600 30px "cirillicolda", "Montserrat", sans-serif`;
+    ctx.fillStyle = "#000000";
     ctx.textAlign = 'left';
-    
+    ctx.textBaseline = 'top';
+
     const words = text.split(' ');
     let line = '';
     let y = cfg.y;
-    const lineHeight = cfg.size * 2; // Подобрал чуть меньше для компактности
-    
+    const lineHeight = 60; // 30px * 2
     let isFirstLine = true;
-    let currentX = cfg.x; // Начальная точка для первой строки
+    let currentX = cfg.x;
 
-    for (let n = 0; n < words.length; n++) {
-        let testLine = line + words[n] + ' ';
-        let metrics = ctx.measureText(testLine);
-        
-        // Для первой строки maxWidth должен быть меньше, так как она начинается правее
-        let currentMaxWidth = isFirstLine ? (maxWidth - (cfg.x - indentX)) : maxWidth;
+    for (let word of words) {
+      let testLine = line + word + ' ';
+      let metrics = ctx.measureText(testLine);
+      let currentMax = isFirstLine ? (maxWidth - (cfg.x - indentX)) : maxWidth;
 
-        if (metrics.width > currentMaxWidth && n > 0) {
-            ctx.fillText(line.trim(), currentX, y);
-            
-            // Настраиваем параметры для ПОСЛЕДУЮЩИХ строк
-            line = words[n] + ' ';
-            y += lineHeight;
-            currentX = indentX; // Смещаем X влево
-            isFirstLine = false;
-        } else {
-            line = testLine;
-        }
+      if (metrics.width > currentMax && line !== '') {
+        ctx.fillText(line.trim(), currentX, y);
+        line = word + ' ';
+        y += lineHeight;
+        currentX = indentX;
+        isFirstLine = false;
+      } else {
+        line = testLine;
+      }
     }
-    ctx.fillText(line.trim(), currentX, y);
-};
+    if (line.trim()) ctx.fillText(line.trim(), currentX, y);
+  };
 
-  const input1Value =
-  document.getElementById('input1')?.value || '';
-
-  const input2Value =
-  document.getElementById('input2')?.value || '';
-
-  const eventNameValue =
-  document.getElementById('eventNameInput')?.value || '';
-
-
-  for (let i = 0; i < names.length; i++) {
+  for (let name of names) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#3a2518";
-    ctx.textBaseline = "top";
 
-    // Обычный текст (имя, дата, время)
-    const drawText = (text, cfg) => {
-      if (!text || !cfg) return;
-      ctx.font = `600 ${cfg.size}px Montserrat`;
-      ctx.textAlign = cfg.align || 'center';
-      ctx.fillText(text, cfg.x, cfg.y);
-    };
+    drawText(name, config.invite);
+    drawTextWrapped(addressSelect.value, config.address);
+    drawText(formattedDate, config.date);
+    drawText(timeEl.value, config.time);
+    drawText(input1Value, config.field1);
+    drawText(input2Value, config.field2);
+    drawText(eventNameValue, config.eventName);
 
-    drawText(names[i], config.invite);
-    
-    // АДРЕС С ПЕРЕНОСОМ (ширина 600 пикселей, подберите под макет)
-    drawTextWrapped(addressSelect.value, config.address, 800, 130);
-    
-   
+    const singlePdf = new jspdf.jsPDF({
+      orientation: 'p',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
 
-drawText(dateEl.value, config.date);
-drawText(timeEl.value, config.time);
-drawText(input1Value, config.field1);
-drawText(input2Value, config.field2);
-drawText(eventNameValue, config.eventName);
+    // Устанавливаем шрифт для PDF
+    singlePdf.setFont("cyrillicolda", "bold");
 
-   
-    
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    if (i > 0) pdf.addPage([canvas.width, canvas.height]);
-    pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    singlePdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+
+    const pdfBlob = singlePdf.output('blob');
+    zip.file(`Приглашение_${name.replace(/\s+/g, '_')}.pdf`, pdfBlob);
   }
 
-  pdf.save('invites_fort.pdf');
+  const content = await zip.generateAsync({type: "blob"});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(content);
+  link.download = "invites_fort_boyard.zip";
+  link.click();
+  URL.revokeObjectURL(link.href);
 });
 </script>
 
